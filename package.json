@@ -1,0 +1,20 @@
+{
+  "name": "fake-store-playwright-docker-ci-cd",
+  "version": "1.0.0",
+  "description": "Hybrid API + UI QA automation portfolio using Playwright, TypeScript, Docker, and GitHub Actions",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@types/node": "^22.13.0",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.7.3"
+  }
+}

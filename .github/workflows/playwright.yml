@@ -1,0 +1,47 @@
+name: Playwright Docker CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Playwright test image
+        run: docker build -t fake-store-playwright-tests .
+
+      - name: Run Playwright tests in container
+        id: run_tests
+        run: |
+          set +e
+          docker run --name fake-store-playwright-run \
+            -e BASE_URL=https://www.saucedemo.com \
+            -e API_URL=https://fakestoreapi.com \
+            -e TEST_USERNAME=standard_user \
+            -e TEST_PASSWORD=secret_sauce \
+            -e HEADLESS=true \
+            -e CI=true \
+            -v ${{ github.workspace }}/playwright-report:/app/playwright-report \
+            -v ${{ github.workspace }}/test-results:/app/test-results \
+            fake-store-playwright-tests
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+
+      - name: Upload Playwright HTML report on failure
+        if: failure() && steps.run_tests.outputs.exit_code != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report
+          path: playwright-report
+          if-no-files-found: ignore
