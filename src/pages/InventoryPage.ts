@@ -4,11 +4,17 @@ export class InventoryPage {
   readonly inventoryContainer: Locator;
   readonly inventoryItems: Locator;
   readonly headerTitle: Locator;
+  readonly menuButton: Locator;
+  readonly menuPanel: Locator;
+  readonly menuCloseButton: Locator;
 
   constructor(private readonly page: Page) {
     this.inventoryContainer = page.locator(".inventory_list");
     this.inventoryItems = page.locator(".inventory_item");
     this.headerTitle = page.locator("span.title");
+    this.menuButton = page.locator("#react-burger-menu-btn");
+    this.menuPanel = page.locator(".bm-menu-wrap");
+    this.menuCloseButton = page.locator("#react-burger-cross-btn");
   }
 
   async assertLoaded(): Promise<void> {
@@ -28,5 +34,12 @@ export class InventoryPage {
 
   async getInventoryItemNames(): Promise<string[]> {
     return this.page.locator(".inventory_item_name").allInnerTexts();
+  }
+
+  /** Opens the hamburger menu and compares it against the stored baseline screenshot. */
+  async assertVisualMenu(): Promise<void> {
+    await this.menuButton.click();
+    await expect(this.menuPanel).toBeVisible();
+    await expect(this.menuPanel).toHaveScreenshot("./snapshots/menu.png", { maxDiffPixelRatio: 0.02 });
   }
 }

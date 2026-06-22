@@ -8,10 +8,12 @@
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
+    "test:trace": "playwright test --trace",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@cerios/playwright-step-decorator": "^2.2.0",
     "@playwright/test": "latest",
     "@types/node": "^22.13.0",
     "dotenv": "^16.4.7",

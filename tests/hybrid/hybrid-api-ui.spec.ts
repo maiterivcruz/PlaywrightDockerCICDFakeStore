@@ -1,12 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/auth.fixture";
 import { FakeStoreApiClient } from "../../src/api/apiClient";
 import { env } from "../../src/config/env";
 import { InventoryPage } from "../../src/pages/InventoryPage";
-import { LoginPage } from "../../src/pages/LoginPage";
 import { Cart, Product } from "../../src/types/fakestore";
 
 test.describe("Hybrid E2E: API seeding + UI validation", () => {
-  test("creates backend cart, updates product, then validates storefront layout", async ({ page, request }) => {
+  test("creates backend cart, updates product, then validates storefront layout", async ({ authenticatedPage, request }) => {
     const api = new FakeStoreApiClient(request, env.apiUrl);
 
     const productUpdatePayload: Partial<Product> = {
@@ -34,11 +33,7 @@ test.describe("Hybrid E2E: API seeding + UI validation", () => {
     expect(createdCart.userId).toBe(cartPayload.userId);
     expect(createdCart.products.length).toBeGreaterThan(0);
 
-    const loginPage = new LoginPage(page);
-    const inventoryPage = new InventoryPage(page);
-
-    await loginPage.goto(env.baseUrl);
-    await loginPage.login(env.testUsername, env.testPassword);
+    const inventoryPage = new InventoryPage(authenticatedPage);
 
     await inventoryPage.assertLoaded();
     await inventoryPage.assertVisualLayout();
@@ -46,6 +41,7 @@ test.describe("Hybrid E2E: API seeding + UI validation", () => {
     const uiProductNames = await inventoryPage.getInventoryItemNames();
     expect(uiProductNames.length).toBeGreaterThan(0);
 
-    await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
+    await expect(authenticatedPage.locator(".shopping_cart_badge")).toHaveCount(0);
   });
 });
+    
